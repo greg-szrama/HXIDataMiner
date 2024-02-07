@@ -1,17 +1,17 @@
 --[[
-* Goal of this addon is to build on hgather, adding configurable elements
-* and eventually extending support to other HELM activities
+* Tracks a slate of game interactions to provide various different statistics related
+* to crafting, chocobo digging, mob farming, etc
 *
-* Used atom0s equipmon as a base for the config elements of this addon
+* Used HGather as a base for this addon, to get configurations and other elements
 * https://ashitaxi.com/';
 --]]
 
-addon.name      = 'hgather';
-addon.author    = 'Hastega';
-addon.version   = '1.4';
-addon.desc      = 'General purpose gathering tracker.';
-addon.link      = 'https://github.com/SlowedHaste/HGather';
-addon.commands  = {'/hgather'};
+addon.name      = 'dataminer';
+addon.author    = 'Imrahil';
+addon.version   = '0.1';
+addon.desc      = 'Data miner for trend analysis and other fun things';
+addon.link      = 'https://github.com/greg-szrama/HXIDataMiner';
+addon.commands  = {'/dataminer'};
 
 require('common');
 local chat      = require('chat');
@@ -52,6 +52,9 @@ local default_settings = T{
     -- Save dig items/tries across sessions for fatigue tracking
     dig_items = 0,
     dig_tries = 0,
+
+    -- Crafting monitoring, record format: [itemid] = {[hq tier] = { nq, break, hq1, hq2, hq3}}
+    craft_results = T{ },
 };
 
 -- HGather Variables
@@ -324,6 +327,25 @@ function clear_rewards()
     hgather.settings.dig_items = 0;
     hgather.settings.dig_tries = 0;
     hgather.digging.dig_skillup = 0.0;
+end
+
+----------------------------------------------------------------------------------------------------
+-- Craft results helper functions
+----------------------------------------------------------------------------------------------------
+function AddCraftResult(item_id, result)
+    if (hgather.settings.craft_results[item_id] == nil)
+	for i=0,4,+1 do
+	    for j=0,5,+1 do
+                hgather.settings.craft_results[item_id][i][j] = 0;
+            end
+        end
+    end
+    
+    hgather.settings.craft_results[item_id][CalculateHqTier(item_id)][result] = hgather.settings.craft_results[item_id][CalculateHqTier(item_id)][result] + 1
+end
+
+function CalculateHqTier(item_id)
+    return 0;
 end
 
 ----------------------------------------------------------------------------------------------------
